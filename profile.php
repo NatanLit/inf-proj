@@ -168,12 +168,12 @@ input:focus, select:focus {
 <div class="container">
 
     <div class="sidebar">
-        <div class="avatar">👤</div>
+        <div class="avatar">U</div>
         <div class="name"><?php echo htmlspecialchars($user['name']); ?></div>
         <div class="menu">
-            <div>📊 Статистика</div>
-            <div>⚙️ Настройки</div>
-            <div>🩺 Состояние</div>
+            <div>Статистика</div>
+            <div>Настройки</div>
+            <div>Состояние</div>
             <div><a href="index.php">Главная</a></div>
             <div><a href="logout.php">Выйти</a></div>
         </div>
