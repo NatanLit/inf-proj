@@ -6,56 +6,65 @@
 <title>Вход</title>
 
 <style>
-body{
-    margin:0;
-    font-family:Arial,sans-serif;
-    background:#f4f7fb;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f7fb;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
-.form-box{
-    background:white;
-    padding:40px;
-    border-radius:20px;
-    width:350px;
-    box-shadow:0 10px 30px rgba(0,0,0,.1);
+.form-box {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    width: 350px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.1);
 }
 
-h2{
-    text-align:center;
-    margin-bottom:25px;
+h2 {
+    text-align: center;
+    margin-bottom: 25px;
 }
 
-input{
-    width:100%;
-    padding:14px;
-    margin-bottom:15px;
-    border-radius:10px;
-    border:1px solid #ccc;
-    box-sizing:border-box;
+input {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    font-size: 14px;
 }
 
-button{
-    width:100%;
-    padding:14px;
-    border:none;
-    border-radius:10px;
-    background:#508A57;
-    color:white;
-    font-size:16px;
-    cursor:pointer;
+button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background: #508A57;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
 }
 
-button:hover{
-    opacity:.9;
+button:hover {
+    opacity: .9;
 }
 
-p{
-    text-align:center;
-    margin-top:15px;
+p {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.error {
+    color: red;
+    font-size: 13px;
+    margin-bottom: 10px;
+    display: none;
+    text-align: center;
 }
 </style>
 </head>
@@ -66,22 +75,44 @@ p{
 
 <h2>Вход</h2>
 
-<form action="login.php" method="POST">
+<p class="error" id="error-msg"></p>
 
-<input type="email" name="email" placeholder="Email" required>
+<form action="login.php" method="POST" onsubmit="return validate()">
 
-<input type="password" name="password" placeholder="Пароль" required>
+<input type="email" name="email" id="email" placeholder="Email" required>
+
+<input type="password" name="password" id="password" placeholder="Пароль" required>
 
 <button type="submit">Войти</button>
 
 </form>
 
-<p>
-Нет аккаунта?
-<a href="register.html">Регистрация</a>
-</p>
+<p>Нет аккаунта? <a href="register.html">Регистрация</a></p>
 
 </div>
+
+<script>
+function validate() {
+    var email    = document.getElementById('email').value.trim();
+    var password = document.getElementById('password').value;
+    var errorMsg = document.getElementById('error-msg');
+
+    if (!email || !password) {
+        errorMsg.style.display = 'block';
+        errorMsg.textContent = 'Заполните все поля';
+        return false;
+    }
+
+    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        errorMsg.style.display = 'block';
+        errorMsg.textContent = 'Введите корректный email';
+        return false;
+    }
+
+    return true;
+}
+</script>
 
 </body>
 </html>
