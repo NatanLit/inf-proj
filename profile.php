@@ -7,9 +7,27 @@ if (!isset($_SESSION['email'])) {
     exit();
 }
 
-$email  = mysqli_real_escape_string($conn, $_SESSION['email']);
-$query  = mysqli_query($conn, "SELECT * FROM users WHERE email='$email'");
-$user   = mysqli_fetch_assoc($query);
+$email = mysqli_real_escape_string($conn, $_SESSION['email']);
+
+// Сохранение данных
+$success = false;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name   = mysqli_real_escape_string($conn, $_POST['name']);
+    $age    = (int) $_POST['age'];
+    $gender = mysqli_real_escape_string($conn, $_POST['gender']);
+
+    $update = mysqli_query($conn,
+        "UPDATE users SET name='$name', age='$age', gender='$gender' WHERE email='$email'"
+    );
+
+    if ($update) {
+        $_SESSION['name'] = $name;
+        $success = true;
+    }
+}
+
+$query = mysqli_query($conn, "SELECT * FROM users WHERE email='$email'");
+$user  = mysqli_fetch_assoc($query);
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -160,6 +178,16 @@ input:focus, select:focus {
 .btn:hover {
     opacity: 0.9;
 }
+
+.success {
+    background: #e6f5f1;
+    color: #2f5f57;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 14px;
+}
 </style>
 </head>
 
@@ -182,31 +210,40 @@ input:focus, select:focus {
     <div class="main">
         <h2>Личные данные</h2>
 
-        <div class="form-group">
-            <label>Имя</label>
-            <input type="text" value="<?php echo htmlspecialchars($user['name']); ?>">
-        </div>
+        <?php if ($success): ?>
+            <div class="success">Данные успешно сохранены!</div>
+        <?php endif; ?>
 
-        <div class="form-group">
-            <label>Email</label>
-            <input type="email" value="<?php echo htmlspecialchars($user['email']); ?>">
-        </div>
+        <form method="POST" action="profile.php">
 
-        <div class="form-group">
-            <label>Возраст</label>
-            <input type="number" value="<?php echo htmlspecialchars($user['age']); ?>">
-        </div>
+            <div class="form-group">
+                <label>Имя</label>
+                <input type="text" name="name" value="<?php echo htmlspecialchars($user['name']); ?>" required>
+            </div>
 
-        <div class="form-group">
-            <label>Пол</label>
-            <select>
-                <option>Женский</option>
-                <option>Мужской</option>
-                <option>Другой</option>
-            </select>
-        </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" value="<?php echo htmlspecialchars($user['email']); ?>" disabled>
+            </div>
 
-        <button class="btn">Сохранить изменения</button>
+            <div class="form-group">
+                <label>Возраст</label>
+                <input type="number" name="age" value="<?php echo htmlspecialchars($user['age']); ?>" required>
+            </div>
+
+            <div class="form-group">
+                <label>Пол</label>
+                <select name="gender">
+                    <option value="Не указан" <?php if($user['gender'] == 'Не указан') echo 'selected'; ?>>Не указан</option>
+                    <option value="Мужской"   <?php if($user['gender'] == 'Мужской')   echo 'selected'; ?>>Мужской</option>
+                    <option value="Женский"   <?php if($user['gender'] == 'Женский')   echo 'selected'; ?>>Женский</option>
+                    <option value="Другой"    <?php if($user['gender'] == 'Другой')    echo 'selected'; ?>>Другой</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn">Сохранить изменения</button>
+
+        </form>
 
         <div class="stats">
             <div class="stat">
