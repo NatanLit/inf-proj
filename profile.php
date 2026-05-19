@@ -16,8 +16,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $age    = (int) $_POST['age'];
     $gender = mysqli_real_escape_string($conn, $_POST['gender']);
 
+    // Загрузка аватарки
+    $avatarSQL = "";
+    if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
+        $imageData = base64_encode(file_get_contents($_FILES['avatar']['tmp_name']));
+        $imageType = $_FILES['avatar']['type'];
+        $avatarBase64 = "data:$imageType;base64,$imageData";
+        $avatarEscaped = mysqli_real_escape_string($conn, $avatarBase64);
+        $avatarSQL = ", avatar='$avatarEscaped'";
+    }
+
     $update = mysqli_query($conn,
-        "UPDATE users SET name='$name', age='$age', gender='$gender' WHERE email='$email'"
+        "UPDATE users SET name='$name', age='$age', gender='$gender'$avatarSQL WHERE email='$email'"
     );
 
     if ($update) {
@@ -71,6 +81,22 @@ body {
     font-size: 36px;
     color: #7DBDA1;
     margin: 0 auto 10px;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.avatar-label {
+    font-size: 12px;
+    color: #7DBDA1;
+    cursor: pointer;
+    margin-bottom: 10px;
 }
 
 .name {
@@ -196,7 +222,18 @@ input:focus, select:focus {
 <div class="container">
 
     <div class="sidebar">
-        <div class="avatar">U</div>
+        <!-- Аватарка -->
+        <label for="avatarInput">
+            <div class="avatar">
+                <?php if (!empty($user['avatar'])): ?>
+                    <img src="<?php echo $user['avatar']; ?>" alt="avatar">
+                <?php else: ?>
+                    U
+                <?php endif; ?>
+            </div>
+        </label>
+        <div class="avatar-label">Нажми чтобы изменить</div>
+
         <div class="name"><?php echo htmlspecialchars($user['name']); ?></div>
         <div class="menu">
             <div>Статистика</div>
@@ -214,7 +251,10 @@ input:focus, select:focus {
             <div class="success">Данные успешно сохранены!</div>
         <?php endif; ?>
 
-        <form method="POST" action="profile.php">
+        <form method="POST" action="profile.php" enctype="multipart/form-data">
+
+            <!-- Скрытый input для загрузки фото -->
+            <input type="file" id="avatarInput" name="avatar" accept="image/*" style="display:none">
 
             <div class="form-group">
                 <label>Имя</label>
@@ -262,6 +302,21 @@ input:focus, select:focus {
     </div>
 
 </div>
+
+<script>
+// Предпросмотр аватарки до сохранения
+document.getElementById('avatarInput').addEventListener('change', function() {
+    var file = this.files[0];
+    if (file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var avatar = document.querySelector('.avatar');
+            avatar.innerHTML = '<img src="' + e.target.result + '" alt="avatar">';
+        };
+        reader.readAsDataURL(file);
+    }
+});
+</script>
 
 </body>
 </html>
