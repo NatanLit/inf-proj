@@ -11,6 +11,7 @@ $email = mysqli_real_escape_string($conn, $_SESSION['email']);
 
 // Сохранение данных
 $success = false;
+$error = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name   = mysqli_real_escape_string($conn, $_POST['name']);
     $age    = (int) $_POST['age'];
@@ -19,11 +20,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Загрузка аватарки
     $avatarSQL = "";
     if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
-        $imageData = base64_encode(file_get_contents($_FILES['avatar']['tmp_name']));
-        $imageType = $_FILES['avatar']['type'];
+        $imageData    = base64_encode(file_get_contents($_FILES['avatar']['tmp_name']));
+        $imageType    = $_FILES['avatar']['type'];
         $avatarBase64 = "data:$imageType;base64,$imageData";
         $avatarEscaped = mysqli_real_escape_string($conn, $avatarBase64);
-        $avatarSQL = ", avatar='$avatarEscaped'";
+        $avatarSQL    = ", avatar='$avatarEscaped'";
     }
 
     $update = mysqli_query($conn,
@@ -33,6 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($update) {
         $_SESSION['name'] = $name;
         $success = true;
+    } else {
+        $error = mysqli_error($conn);
     }
 }
 
@@ -249,6 +252,11 @@ input:focus, select:focus {
 
         <?php if ($success): ?>
             <div class="success">Данные успешно сохранены!</div>
+        <?php endif; ?>
+        <?php if ($error): ?>
+            <div style="background:#fde;color:#900;padding:12px;border-radius:10px;margin-bottom:15px;font-size:14px;">
+                Ошибка: <?php echo htmlspecialchars($error); ?>
+            </div>
         <?php endif; ?>
 
         <form method="POST" action="profile.php" enctype="multipart/form-data">
