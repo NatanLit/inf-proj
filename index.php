@@ -177,7 +177,7 @@ nav a:hover {
 
         <?php if(isset($_SESSION['email'])): ?>
 
-            <a href="dashboard.php">Личный кабинет</a>
+            <a href="profile.php">Личный кабинет</a>
             <a href="logout.php">Выйти</a>
 
         <?php else: ?>
